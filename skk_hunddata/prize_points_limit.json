@@ -1,0 +1,61 @@
+{
+    "Agility": null,
+    "Freestyle": {},
+    "Lydnad": {
+        "2023": {
+            "Startklass": {
+                "1:a pris": 160,
+                "2:a pris": 140,
+                "3:e pris": 100,
+                "0": 0
+            },
+            "Klass 1": {
+                "1:a pris": 256,
+                "2:a pris": 224,
+                "3:e pris": 192,
+                "0": 0
+            },
+            "Klass 2": {
+                "1:a pris": 256,
+                "2:a pris": 224,
+                "3:e pris": 192,
+                "0": 0
+            },
+            "Klass 3": {
+                "1:a pris": 256,
+                "2:a pris": 224,
+                "3:e pris": 192,
+                "0": 0
+            }
+        },
+        "2017": {
+            "Startklass": {
+                "Uppflyttad": 160,
+                "Godkänd": 120,
+                "0": 0
+            },
+            "Klass 1": {
+                "1:a pris": 256,
+                "2:a pris": 224,
+                "3:e pris": 192,
+                "0": 0
+            },
+            "Klass 2": {
+                "1:a pris": 256,
+                "2:a pris": 224,
+                "3:e pris": 192,
+                "0": 0
+            },
+            "Klass 3": {
+                "1:a pris": 256,
+                "2:a pris": 224,
+                "3:e pris": 192,
+                "0": 0
+            }
+        }
+    },
+    "Bruksprov": {},
+    "Nosework": {},
+    "Rallylydnad": {},
+    "Viltspårprov": null
+}

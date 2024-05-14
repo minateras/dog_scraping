@@ -1,0 +1,8 @@
+__pycache__
+.DS_Store
+.vscode
+.env
+polar_plot/input/*.json
+polar_plot/output/*.png
+!polar_plot/input/ideal*.json
+TODO.md

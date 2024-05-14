@@ -1,0 +1,77 @@
+from polar_plot import PolarPlot
+
+
+class BPH(PolarPlot):
+    CHARACTERISTICS = (
+        'Hälsning främmande person intensitet',
+        'Hälsning främmande person tid',
+        'Hälsning närmande person intensitet',
+        'Hälsning närmande person tid',
+        'Undergivenhet',
+        'Lekintresse egen leksak',
+        'Lekintresse ny leksak',
+        'Dragkampsintresse',
+        'Engagemang för mat',
+        'Lekintresse föraren',
+        'Kontakt vid mat',
+        'Överraskningsnyfikenhet',
+        'Skrammelnyfikenhet',
+        'Skottaktivitet',
+        'Undersökning av annat',
+        'Oro främmande person',
+        'Oro närmande person',
+        'Avståndstagande främmande person',
+        'Avståndstagande närmande person',
+        'Separationsoro promenad',
+        'Överraskningsoro',
+        'Skrammeloro',
+        'Överraskningsflykt',
+        'Skrammelflykt',
+        'Skottosäkerhet',
+        'Underlagsosäkerhet',
+        'Hotfullhet närmande person',
+        'Hotfullhet främmande person',
+        'Offensiv reaktion vid överraskning',
+        'Hotfullhet överraskning',
+        'Imponerbeteende',
+    )
+    EXPECTED = (
+        2.3,
+        2.4,
+        2.5,
+        2.3,
+        1.1,
+        3.6,
+        3.1,
+        2.1,
+        2.9,
+        1.1,
+        2.0,
+        2.2,
+        2.8,
+        2.1,
+        1.8,
+        1.8,
+        1.6,
+        1.9,
+        1.5,
+        1.8,
+        1.6,
+        1.3,
+        2.8,
+        1.7,
+        1.4,
+        1.7,
+        2.1,
+        1.0,
+        1.1,
+        1.5,
+        1.1,
+        2.3,
+    )
+    IDEAL = 'ideal_bph.json'
+
+
+    def __init__(self, dogs_with_actual):
+        ideal = PolarPlot.get_input_file(self.IDEAL)
+        super().__init__(self.CHARACTERISTICS, self.EXPECTED, ideal, dogs_with_actual, self)
