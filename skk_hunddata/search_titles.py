@@ -155,7 +155,7 @@ class SearchTitles(SkkHunddata):
                         title = column[1]
 
             # Ensures that the title is a valid one (i.e., not a show title):
-            dog_sport_title = self.validate_title(title, dog, title_dog)
+            dog_sport_title = self.validate_title(title)
             if dog_sport_title is not None:
                 if title_dog.get(dog_sport_title) is None: title_dog[dog_sport_title] = [dog]
                 else: title_dog[dog_sport_title].append(dog)
