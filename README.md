@@ -10,13 +10,21 @@ To run the scrips, you must set up a database (preferable MySQL). Run the file c
 
 This script creates polar plots for two types of Swedish mentality tests: _Behavior and Personality Assessment (BPH)_, as well as _Mentality Description (MH)_. Update the values in _ideal_bph.json_ and _ideal_mh.json_ inside the _input_ folder to match your ideal result. Inside this same folder, create a JSON file and paste your dog's results inside of an array. Then run the script and choose the type of plot you want to generate (i.e., _BPH_ or _MH_). Afterwards, you enter the name of the file you just created. The plot will then be generated and the result will be saved to the _output_ folder.
 
-## skk_hunddata
+## skk
 
-### search_competitions.py
+### skk_avelsdata
+
+#### search_kennel_names.py
+
+This script retrieves all rhodesian ridgeback kennel names that have at least one litter registered.
+
+### skk_hunddata
+
+#### search_competitions.py
 
 This script retrieves rhodesian ridgeback's competition results in dog sports since 1993. At the moment obedience and working dog trials are supported. Besides single competition results, it also retrieves titles and thus complements _search_titles.py_.
 
-### search_titles.py
+#### search_titles.py
 
 This script retrieves rhodesian ridgeback's dog sport titles since 2006. All titles from sports recognized by _The Swedish Kennel Club_ are supported.
 
