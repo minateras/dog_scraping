@@ -95,4 +95,4 @@ class PolarPlot:
 
     def __save_as_image_file(self, object, with_explanations=False):
         image_file = f'{type(object).__name__}{'_2' if with_explanations else ''}.png'
-        plt.savefig(self.PATH / f'output/{image_file}', bbox_inches=self.FIT, transparent=True)
+        plt.savefig(self.PATH / f'output/{image_file}', bbox_inches=self.FIT, format='png', transparent=True)

@@ -92,8 +92,16 @@ class SkkHunddata:
         return None
 
 
-    def normalize_kennel_name(self, kennel_name):
-        return kennel_name.title().replace('\'S', '\'s')
+    def normalize_kennel_name(self, kennel_name: str) -> str:
+        kennel_name = list(kennel_name.title())
+        for i in range(1, len(kennel_name)):
+            previous = kennel_name[i - 1]
+            current = kennel_name[i]
+            next = kennel_name[i + 1] if (i + 1) < len(kennel_name) else None
+            # If previous is an apostrophe, current is a letter, and next is a space (or the end):
+            if previous == "'" and current.isalpha() and (next == ' ' or next is None):
+                kennel_name[i] = current.lower()
+        return ''.join(kennel_name)
 
 
     def save_dog(self, kennel_name, registration_number):
