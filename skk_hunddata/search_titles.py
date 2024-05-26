@@ -90,11 +90,11 @@ class SearchTitles(SkkHunddata):
                 if message.text.strip() == 'Det finns inga registrerade championat för denna period/ras.':
                     self.randomized_delay()
                     continue
-                self.wait_until(self.Values.TABLE.value, by=By.XPATH)
+                self.wait_until(self.Values.TABLE.value, By.XPATH)
 
                 rows = self.find_elements(self.Values.ROWS.value)
                 for row in rows:
-                    columns = self.find_elements(self.Values.COLUMNS.value, by=By.XPATH, parent=row)
+                    columns = self.find_elements(self.Values.COLUMNS.value, By.XPATH, row)
                     dog_info = self.__cut_out_titles(columns[0].text.strip())
                     titles = columns[len(columns) - 1].text.split(self.SEPARATOR)
 
@@ -146,11 +146,11 @@ class SearchTitles(SkkHunddata):
             for i in range(len(rows) - 1, -1, -1):
                 row = rows[i]
                 if row.get_attribute('class') == 'tabellrubrik':
-                    column = datetime.strptime(self.find_element(self.Values.COLUMN.value, by=By.XPATH, parent=row).text.strip()[0:10], '%Y-%m-%d')
+                    column = datetime.strptime(self.find_element(self.Values.COLUMN.value, By.XPATH, row).text.strip()[0:10], '%Y-%m-%d')
                     if column.year >= dog[self.DATE].year and column.month > dog[self.DATE].month:
                         break
                 else:
-                    column = self.find_elements('child::*', by=By.XPATH, parent=row)[1].text.strip().split(self.SEPARATOR)
+                    column = self.find_elements('child::*', By.XPATH, row)[1].text.strip().split(self.SEPARATOR)
                     if 'Godkänt championat' in column[0]:
                         title = column[1]
 

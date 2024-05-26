@@ -172,7 +172,7 @@ class SearchCompetitions(SkkHunddata):
                                 new_page = False
                                 continue
 
-                        link = self.find_element('td/a', by=By.XPATH, parent=row) # Link to competition results page.
+                        link = self.find_element('td/a', By.XPATH, row) # Link to competition results page.
                         date = datetime.strptime(link.text[0:10], '%Y-%m-%d') # Extracts the competition date.
                         link.click() # Navigates to the competition results page.
 
@@ -187,7 +187,7 @@ class SearchCompetitions(SkkHunddata):
                                 if competition_result is not None:
                                     competition_results.append(competition_result)
                                     data_types_index = 0
-                                registration_number = self.find_element('a', by=By.XPATH, parent=columns[0]).text
+                                registration_number = self.find_element('a', By.XPATH, columns[0]).text
                                 kennel_name = columns[1].text
                                 competition_result = {
                                     'registration_number': registration_number,
