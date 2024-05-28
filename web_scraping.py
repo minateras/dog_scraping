@@ -3,7 +3,6 @@ from random import randint
 from time import sleep
 
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 from selenium.webdriver.support.ui import Select
@@ -11,9 +10,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 class WebScraping:
-    __OPTIONS = Options().add_experimental_option('detach', True)
-    __DRIVER = webdriver.Chrome(__OPTIONS)
-    __WAIT = WebDriverWait(__DRIVER, 60)
+    __OPTIONS = webdriver.ChromeOptions()
+    __driver = None
+    __wait = None
 
 
     @staticmethod
@@ -21,22 +20,30 @@ class WebScraping:
         return date.today().year + 1;
 
 
+    def __init__(self):
+        self.__OPTIONS.add_argument('--disable-gpu')
+        self.__OPTIONS.add_argument('--headless')
+        self.__OPTIONS.add_argument('--no-sandbox')
+        self.__driver = webdriver.Chrome(self.__OPTIONS)
+        self.__wait = WebDriverWait(self.__driver, 60)
+
+
     def print_title(self, title=None):
-        print(f'CRAWLING {title if title is not None else self.__DRIVER.title}...')
+        print(f'CRAWLING {title if title is not None else self.__driver.title}...')
 
 
     def get(self, url):
-        self.__DRIVER.get(url)
+        self.__driver.get(url)
 
 
     def wait_until(self, value, by=By.ID):
-        self.__WAIT.until(presence_of_element_located((by, value)))
+        self.__wait.until(presence_of_element_located((by, value)))
 
 
     def find_element(self, value, by=By.ID, parent=None):
         if parent is not None:
             return parent.find_element(by, value)
-        return self.__DRIVER.find_element(by, value)
+        return self.__driver.find_element(by, value)
 
 
     def select(self, value):
@@ -46,11 +53,11 @@ class WebScraping:
     def find_elements(self, value, by=By.XPATH, parent=None):
         if parent is not None:
             return parent.find_elements(by, value)
-        return self.__DRIVER.find_elements(by, value)
+        return self.__driver.find_elements(by, value)
 
 
     def back(self):
-        self.__DRIVER.back()
+        self.__driver.back()
 
 
     def randomized_delay(self, min=1, max=5):
@@ -58,4 +65,4 @@ class WebScraping:
 
 
     def quit(self):
-        self.__DRIVER.quit()
+        self.__driver.quit()
