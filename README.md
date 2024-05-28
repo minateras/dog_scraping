@@ -1,6 +1,6 @@
 # README
 
-Dog Scraping is a repository containing a number of scripts for scraping dog-related data. The data mined by these scrips is used by this website: [Ridgerunner](https://www.ridgerunner.se "Kennel Messenger Dog").
+Dog Scraping is a repository containing a number of scripts for scraping dog-related data. The data mined by these scrips is used by this website: [Svenska* Arbetande Rhodesian Ridgebacks](https://www.ridgerunner.se/workingridge_app "Svenska* Arbetande Rhodesian Ridgebacks").
 
 To run the scrips, you must set up a database (preferable MySQL). Run the file called _create.sql_ to set up the required tables in the database. Create a file named _.env_ in the root of this repository, where you provide the configuration details for the database.
 
