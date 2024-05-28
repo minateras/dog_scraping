@@ -105,7 +105,7 @@ class SkkHunddata:
 
 
     def save_dog(self, kennel_name, registration_number):
-        self.execute("""SELECT id FROM dog2 WHERE registration_number = %s""", (registration_number, ))
+        self.execute("""SELECT id FROM dog2 WHERE kennel_name = %s""", (kennel_name, ))
         if self.fetch_one() is None:
             self.execute("""INSERT INTO dog2(kennel_name, registration_number) VALUES (%s, %s)""", (kennel_name, registration_number))
 

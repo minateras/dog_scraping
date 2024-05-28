@@ -31,11 +31,12 @@ class SearchCompetitions(SkkHunddata):
         SELECT_DATE = 'bodyContent_txtTillfalle'
         SELECT_COMPETITION_TYPE = 'bodyContent_ddlTypkod'
         COMPETITION_TYPES = {
-            # 'Bruksprov Int': ['sport', 'klass', 'prize', 'points'],
-            # 'Bruksprov Nat': ['sport', 'klass', 'prize', 'points'],
-            # 'Bruksprov Nat Plac.': ['sport', 'klass', 'prize', 'points'],
-            # 'Lydnad Int.': ['klass', 'points', 'prize'],
+            'Bruksprov Int': ['sport', 'klass', 'prize', 'points'],
+            'Bruksprov Nat': ['sport', 'klass', 'prize', 'points'],
+            'Bruksprov Nat Plac.': ['sport', 'klass', 'prize', 'points'],
+            'Lydnad Int.': ['klass', 'points', 'prize'],
             'Lydnad Nat.': ['klass', 'points', 'prize'],
+            'Viltspårprov': ['klass', 'prize'],
         }
         SELECT_BREED = 'bodyContent_ddlRas'
         BUTTON_SEARCH = 'bodyContent_btnSearch'
@@ -64,7 +65,8 @@ class SearchCompetitions(SkkHunddata):
 
     def __normalize_sport(self, competition_type, sport):
         if 'Bruksprov' in competition_type: return sport
-        return 'Lydnad';
+        elif 'Lydnad' in competition_type: return 'Lydnad'
+        return 'Viltspår'
 
 
     def __normalize_klass(self, competition_type, klass, date):
@@ -73,31 +75,38 @@ class SearchCompetitions(SkkHunddata):
             elif klass == 'LKL': return 'Lägre klass'
             elif klass == 'HKL': return 'Högre klass'
             elif klass == 'EKL': return 'Elitklass'
-        year = date.year
-        if klass == 'Startklass': return klass
-        elif klass == 'Klass 1':
-            if year < 2017: return 'Startklass'
-            return klass
-        elif klass == 'Klass 2':
-            if year < 2017: return 'Klass 1'
-            return klass
-        elif klass == 'Klass 3':
-            if year < 2017: return 'Klass 2'
-            return klass
-        elif klass == 'EKL': return 'Klass 3'
+        elif 'Lydnad' in competition_type:
+            year = date.year
+            if klass == 'Startklass': return klass
+            elif klass == 'Klass 1':
+                if year < 2017: return 'Startklass'
+                return klass
+            elif klass == 'Klass 2':
+                if year < 2017: return 'Klass 1'
+                return klass
+            elif klass == 'Klass 3':
+                if year < 2017: return 'Klass 2'
+                return klass
+            elif klass == 'EKL': return 'Klass 3'
+        return klass
 
 
-    def __normalize_prize(self, sport, klass, date, points):
+    def __normalize_prize(self, sport, klass, date, points, prize):
         def get_year():
             year = date.year
-            if sport == 'Bruksprov': return None
             if year >= 2017:
                 if year >= 2023: return str(2023)
                 return str(2017)
             return None
+
+
         try:
-            for prize, limit in self.prize_points_limit[sport][get_year()][klass].items():
-                if limit <= points: return prize
+            if sport == 'Lydnad':
+                for p, l in self.prize_points_limit[sport][get_year()][klass].items():
+                    if l <= points: return p
+            elif sport == 'Viltspår':
+                for p, l in self.prize_points_limit[sport][klass].items():
+                    if l == prize: return p
         except: pass # Can't use a finally clause.
         return None
 
@@ -200,13 +209,24 @@ class SearchCompetitions(SkkHunddata):
                             else:
                                 values = columns[1].text.split(self.SEPARATOR)
                                 value = values[len(values) - 1]
-                                if (competition_type == 'Lydnad Int.' or competition_type == 'Lydnad Nat.') and data_types[data_types_index] == 'klass': value = values[0].split(':')[0]
                                 if 'Godkänt championat' in values[0]:
                                     if competition_result.get('title') is None: competition_result['title'] = [values[1]]
                                     else: competition_result['title'].append(values[1])
                                 elif 'Domare' in value:
-                                    data_types_index = 0 # Required considering that one dog can have multiple results from one competition and since prize is not always filled in.
-                                elif 'HP' in value: pass # An unidentified value that shows up in a couple of old obedience results.
+                                    data_types_index = 0
+                                # Fix for obedience, where klass and placement are on the same column:
+                                elif 'Lydnad' in competition_type and data_types_index == 0:
+                                    competition_result[data_types[data_types_index]].append(values[0].split(':')[0])
+                                    data_types_index += 1
+                                # Irrelevant columns:
+                                elif 'Lydnad' in competition_type and 'HP' in value: pass
+                                elif competition_type == 'Viltspårprov' and ('Rörligt prov' in value or 'Ordinarie prov' in value or 'Godk skottprövning' in value or 'HP' in value): pass
+                                # Fix for working dog trials, bug where sport is missing (id: 1998-04-18-011):
+                                elif competition_type == 'Bruksprov Nat' and data_types_index == 0 and 'AKL' in value:
+                                    competition_result[data_types[data_types_index]].append('SPÅR')
+                                    data_types_index += 1
+                                    competition_result[data_types[data_types_index]].append(value)
+                                    data_types_index += 1
                                 else:
                                     competition_result[data_types[data_types_index]].append(value)
                                     if data_types_index == len(data_types) - 1: data_types_index = 0 # Required considering that one dog can have multiple results from one competition.
@@ -222,8 +242,10 @@ class SearchCompetitions(SkkHunddata):
                 klass = competition_result['klass']
                 sport = competition_result.get('sport')
                 sport = sport if sport is not None else []
-                points = competition_result['points']
-                # prize = competition_result['prize']
+                points = competition_result.get('points')
+                points = points if points is not None else []
+                prize = competition_result.get('prize')
+                prize = prize if prize is not None else []
                 titles = competition_result.get('title')
                 titles = titles if titles is not None else []
                 for i in range(0, len(klass)):
@@ -234,7 +256,8 @@ class SearchCompetitions(SkkHunddata):
                     sport2 = self.__normalize_sport(competition_type, sport2.title() if sport2 is not None else sport2)
                     points2 = str(0) if len(points) == 0 else points[i] if i < len(points) else points[len(points) - 1]
                     points2 = float(points2.replace(',', '.'))
-                    prize2 = self.__normalize_prize(sport2, klass2, competition_result[self.DATE], points2) # None if len(prize) == 0 else prize[i] if i < len(prize) else prize[len(prize) - 1]
+                    prize2 = None if len(prize) == 0 else prize[i] if i < len(prize) else prize[len(prize) - 1]
+                    prize2 = self.__normalize_prize(sport2, klass2, competition_result[self.DATE], points2, prize2)
                     print(competition_result[self.REGISTRATION_NUMBER], competition_result[self.KENNEL_NAME], competition_result[self.DATE], sport2, klass2, points2, prize2, sep='\n')
                     self.execute(
                         """SELECT * FROM competition_result2 WHERE klass = (SELECT id FROM klass2 WHERE klass = %s AND sport = (SELECT id FROM sport2 WHERE sport = %s)) AND dog = (SELECT id FROM dog2 WHERE kennel_name = %s) AND date = %s AND points = %s AND prize = %s""" if prize2 is not None else """SELECT * FROM competition_result2 WHERE klass = (SELECT id FROM klass2 WHERE klass = %s AND sport = (SELECT id FROM sport2 WHERE sport = %s)) AND dog = (SELECT id FROM dog2 WHERE kennel_name = %s) AND date = %s AND points = %s AND prize IS NULL""",
@@ -249,8 +272,8 @@ class SearchCompetitions(SkkHunddata):
                     # Ensures that the title is a valid one (i.e., not a show title):
                     dog_sport_title = self.validate_title(title)
                     if dog_sport_title is not None:
-                        print(title)
-                        self.save_title(title, competition_result[self.REGISTRATION_NUMBER], competition_result[self.DATE])
+                        print(dog_sport_title)
+                        self.save_title(dog_sport_title, competition_result[self.REGISTRATION_NUMBER], competition_result[self.DATE])
 
 
 if __name__ == '__main__':

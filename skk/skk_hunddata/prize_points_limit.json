@@ -57,5 +57,16 @@
     "Bruksprov": {},
     "Nosework": {},
     "Rallylydnad": {},
-    "Viltspårprov": null
+    "Viltspår": {
+        "Anlagsklass": {
+            "Godkänd": "GK",
+            "0": "Ej GK"
+        },
+        "Öppen klass": {
+            "1:a pris": "1",
+            "2:a pris": "2",
+            "3:e pris": "3",
+            "0": "0"
+        }
+    }
 }

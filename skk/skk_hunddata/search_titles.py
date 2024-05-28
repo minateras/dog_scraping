@@ -55,10 +55,11 @@ class SearchTitles(SkkHunddata):
 
 
     def __cut_out_titles(self, dog_info):
-        length = len(dog_info)
-        for i in range(0, length):
-            character = dog_info[i]
-            if character != character.upper(): return dog_info[i - 1:length]
+        for i in range(1, len(dog_info)):
+            previous = dog_info[i - 1]
+            current = dog_info[i]
+            next = dog_info[i + 1] if (i + 1) < len(dog_info) else None
+            if previous == ' ' and current == current.upper() and ((next.isalpha() and next != next.upper()) or (next.isalpha() is False and next == "'")): return dog_info[i:len(dog_info)]
 
 
     def __separate_kennel_name_and_registration_number(self, dog_info):
