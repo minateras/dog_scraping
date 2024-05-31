@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -10,7 +11,7 @@ from database import Database
 from web_scraping import WebScraping
 
 
-class SkkHunddata:
+class SKK:
     __WS = WebScraping()
     __DB = Database()
     BREED = 'Rhodesian ridgeback'
@@ -114,3 +115,8 @@ class SkkHunddata:
         self.execute("""SELECT date FROM title_dog2 WHERE title = (SELECT id FROM title2 WHERE title = %s) AND dog = (SELECT id FROM dog2 WHERE registration_number = %s) LIMIT 1""", (title, registration_number))
         if self.fetch_one() is None:
             self.execute("""INSERT INTO title_dog2(title, dog, date) VALUES ((SELECT id FROM title2 WHERE title = %s), (SELECT id FROM dog2 WHERE registration_number = %s), %s)""", (title, registration_number, date))
+
+
+    def update_date(self):
+        self.execute("""DELETE FROM date2""")
+        self.execute("""INSERT INTO date2(date) VALUES (%s)""", (datetime.today(), ))

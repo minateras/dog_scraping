@@ -6,10 +6,10 @@ from selenium.webdriver.common.by import By
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # Appends the parent dir to the Python path.
 
-from skk_hunddata import SkkHunddata
+from skk import SKK
 
 
-class SearchKennelNames(SkkHunddata):
+class SearchKennelNames(SKK):
     URL = 'https://hundar.skk.se/avelsdata/Flikar.aspx?sida=Ras_info&id=679'
 
 
@@ -28,6 +28,7 @@ class SearchKennelNames(SkkHunddata):
 
         try:
             self.__run()
+            self.update_date()
         except Exception as exception:
             self.handle_exception(exception)
         finally:

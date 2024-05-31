@@ -13,12 +13,12 @@ from selenium.webdriver.common.by import By
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from skk_hunddata import SkkHunddata
+from skk import SKK
 
 from web_scraping import WebScraping
 
 
-class SearchCompetitions(SkkHunddata):
+class SearchCompetitions(SKK):
     URL = 'https://hundar.skk.se/hunddata/Tavling_sok.aspx'
     start_year = 1993
     END_YEAR = WebScraping.get_next_year()
@@ -57,6 +57,7 @@ class SearchCompetitions(SkkHunddata):
 
         try:
             self.__run()
+            self.update_date()
         except Exception as exception:
             self.handle_exception(exception)
         finally:

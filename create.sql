@@ -1,3 +1,9 @@
+CREATE TABLE date2(
+    id SMALLINT NOT NULL,
+    date DATE UNIQUE NOT NULL,
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE sport2(
     id SMALLINT NOT NULL,
     sport VARCHAR(25) UNIQUE NOT NULL,
@@ -57,5 +63,11 @@ CREATE TABLE title_dog2(
 CREATE TABLE exception2(
     id SMALLINT NOT NULL,
     exception TEXT NOT NULL,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE kennel2(
+    id SMALLINT NOT NULL,
+    name VARCHAR(25) UNIQUE NOT NULL,
     PRIMARY KEY(id)
 );
