@@ -5,11 +5,9 @@ from enum import Enum
 
 from selenium.webdriver.common.by import By
 
-# Appends the parent dirs to the Python path:
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))) # Appends the grandparent dir to the Python path.
 
-from skk import SKK
+from skk.SKK import SKK
 
 from web_scraping import WebScraping
 
