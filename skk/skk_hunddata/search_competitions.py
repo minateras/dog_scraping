@@ -38,7 +38,7 @@ class SearchCompetitions(SKK):
                 'data_types': ['sport', 'klass', 'prize', 'points'],
             },
             'Bruksprov Nat Plac.': {
-                'search_interval': [1998, 1999],
+                'search_interval': [1999, 2000],
                 'data_types': ['sport', 'klass', 'prize', 'points'],
             },
             'Lydnad Int.': {
