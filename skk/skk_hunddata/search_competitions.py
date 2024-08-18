@@ -128,7 +128,7 @@ class SearchCompetitions(SKK):
                 for m in range(self.start_month, self.END_MONTH): # self.start_month, self.END_MONTH
                     select_date = self.find_element(self.Values.SELECT_DATE.value)
                     select_date.clear()
-                    select_date.send_keys(f'{y}-{str(m).rjust(2, '0')}')
+                    select_date.send_keys(f"{y}-{str(m).rjust(2, '0')}")
 
                     search = self.find_element(self.Values.BUTTON_SEARCH.value)
                     search.click()
