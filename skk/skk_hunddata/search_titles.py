@@ -7,8 +7,8 @@ from selenium.webdriver.common.by import By
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))) # Appends the grandparent dir to the Python path.
 
+from database import Database
 from skk.SKK import SKK
-
 from web_scraping import WebScraping
 
 
@@ -37,8 +37,10 @@ class SearchTitles(SKK):
 
     def __init__(self):
         super().__init__(self.URL)
-        self.execute("""SELECT MAX(date) FROM title_dog2""")
-        date = self.fetch_one()[0]
+        db = Database()
+        db.execute("""SELECT MAX(date) FROM title_dog2""")
+        date = db.fetch_one()[0]
+        db.close()
         if date is not None:
             date = date
             self.start_year = date.year
@@ -165,11 +167,13 @@ class SearchTitles(SKK):
             if i != len(missing_titles) - 1:
                 self.randomized_delay()
 
+        db = Database()
         for title in title_dog:
             for dog in title_dog[title]:
                 dog[self.KENNEL_NAME] = self.normalize_kennel_name(dog[self.KENNEL_NAME])
-                self.save_dog(dog[self.KENNEL_NAME], dog[self.REGISTRATION_NUMBER])
-                self.save_title(title, dog[self.REGISTRATION_NUMBER], dog[self.DATE])
+                self.save_dog(db, dog[self.KENNEL_NAME], dog[self.REGISTRATION_NUMBER])
+                self.save_title(db, title, dog[self.REGISTRATION_NUMBER], dog[self.DATE])
+        db.close()
 
 
 if __name__ == '__main__':

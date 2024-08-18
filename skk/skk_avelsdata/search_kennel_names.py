@@ -6,6 +6,7 @@ from selenium.webdriver.common.by import By
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))) # Appends the grandparent dir to the Python path.
 
+from database import Database
 from skk.SKK import SKK
 
 
@@ -52,16 +53,18 @@ class SearchKennelNames(SKK):
         table = self.find_elements(self.Values.TABLE.value)
         for row in table:
             if row.get_attribute('class') != self.Values.HEADER.value:
+                db = Database()
                 kennel_name = self.find_element(self.Values.COLUMN.value, By.XPATH, row).text
-                self.execute(
+                db.execute(
                     """SELECT * FROM kennel2 WHERE name = %s""",
                     (kennel_name, ),
                 )
-                if self.fetch_one() is None:
-                    self.execute(
+                if db.fetch_one() is None:
+                    db.execute(
                         """INSERT INTO kennel2(name) VALUES (%s)""",
                         (kennel_name, ),
                     )
+                db.close()
 
 
 if __name__ == '__main__':

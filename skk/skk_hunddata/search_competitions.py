@@ -11,8 +11,8 @@ from selenium.webdriver.common.by import By
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))) # Appends the grandparent dir to the Python path.
 
+from database import Database
 from skk.SKK import SKK
-
 from web_scraping import WebScraping
 
 
@@ -44,8 +44,10 @@ class SearchCompetitions(SKK):
 
     def __init__(self):
         super().__init__(self.URL)
-        self.execute("""SELECT MAX(date) FROM competition_result2""")
-        date = self.fetch_one()[0]
+        db = Database()
+        db.execute("""SELECT MAX(date) FROM competition_result2""")
+        date = db.fetch_one()[0]
+        db.close()
         if date is not None:
             date = date
             self.start_year = date.year
@@ -235,9 +237,10 @@ class SearchCompetitions(SKK):
                         table_row_index += 1
                         self.randomized_delay()
 
+            db = Database()
             for competition_result in competition_results:
                 competition_result[self.KENNEL_NAME] = self.normalize_kennel_name(competition_result[self.KENNEL_NAME])
-                self.save_dog(competition_result[self.KENNEL_NAME], competition_result[self.REGISTRATION_NUMBER])
+                self.save_dog(db, competition_result[self.KENNEL_NAME], competition_result[self.REGISTRATION_NUMBER])
                 klass = competition_result['klass']
                 sport = competition_result.get('sport')
                 sport = sport if sport is not None else []
@@ -258,12 +261,12 @@ class SearchCompetitions(SKK):
                     prize2 = None if len(prize) == 0 else prize[i] if i < len(prize) else prize[len(prize) - 1]
                     prize2 = self.__normalize_prize(sport2, klass2, competition_result[self.DATE], points2, prize2)
                     print(competition_result[self.REGISTRATION_NUMBER], competition_result[self.KENNEL_NAME], competition_result[self.DATE], sport2, klass2, points2, prize2, sep='\n')
-                    self.execute(
+                    db.execute(
                         """SELECT * FROM competition_result2 WHERE klass = (SELECT id FROM klass2 WHERE klass = %s AND sport = (SELECT id FROM sport2 WHERE sport = %s)) AND dog = (SELECT id FROM dog2 WHERE kennel_name = %s) AND date = %s AND points = %s AND prize = %s""" if prize2 is not None else """SELECT * FROM competition_result2 WHERE klass = (SELECT id FROM klass2 WHERE klass = %s AND sport = (SELECT id FROM sport2 WHERE sport = %s)) AND dog = (SELECT id FROM dog2 WHERE kennel_name = %s) AND date = %s AND points = %s AND prize IS NULL""",
                         (klass2, sport2, competition_result[self.KENNEL_NAME], competition_result[self.DATE], points2, prize2) if prize2 is not None else (klass2, sport2, competition_result[self.KENNEL_NAME], competition_result[self.DATE], points2),
                     )
-                    if self.fetch_one() is None:
-                        self.execute(
+                    if db.fetch_one() is None:
+                        db.execute(
                             """INSERT INTO competition_result2(klass, dog, date, points, prize) VALUES ((SELECT id FROM klass2 WHERE klass = %s AND sport = (SELECT id FROM sport2 WHERE sport = %s)), (SELECT id FROM dog2 WHERE kennel_name = %s), %s, %s, %s)""",
                             (klass2, sport2, competition_result[self.KENNEL_NAME], competition_result[self.DATE], points2, prize2),
                         )
@@ -272,7 +275,8 @@ class SearchCompetitions(SKK):
                     dog_sport_title = self.validate_title(title)
                     if dog_sport_title is not None:
                         print(dog_sport_title)
-                        self.save_title(dog_sport_title, competition_result[self.REGISTRATION_NUMBER], competition_result[self.DATE])
+                        self.save_title(db, dog_sport_title, competition_result[self.REGISTRATION_NUMBER], competition_result[self.DATE])
+            db.close()
 
 
 if __name__ == '__main__':

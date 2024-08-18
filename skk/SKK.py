@@ -13,7 +13,6 @@ from web_scraping import WebScraping
 
 class SKK:
     __WS = WebScraping()
-    __DB = Database()
     BREED = 'Rhodesian ridgeback'
     SEPARATOR = '   '
     REGISTRATION_NUMBER = 'registration_number'
@@ -27,9 +26,11 @@ class SKK:
         self.print_title()
 
         # Retrieves all valid titles.
-        self.execute("""SELECT title FROM title2""")
-        for title in self.fetch_all():
+        db = Database()
+        db.execute("""SELECT title FROM title2""")
+        for title in db.fetch_all():
             self.titles.append(title[0])
+        db.close()
 
 
     def print_title(self):
@@ -43,7 +44,9 @@ class SKK:
     def handle_exception(self, exception):
         if isinstance(exception, TimeoutException): print('A TimeoutException occurred.')
         else: print(exception)
-        self.execute("""INSERT INTO exception2(exception) VALUES (%s)""", (str(exception), ))
+        db = Database()
+        db.execute("""INSERT INTO exception2(exception) VALUES (%s)""", (str(exception), ))
+        db.close()
 
 
     def wait_until(self, value, by=By.ID):
@@ -70,21 +73,8 @@ class SKK:
         self.__WS.randomized_delay(min, max)
 
 
-    def execute(self, query, arguments=None):
-        self.__DB.execute(query, arguments)
-
-
-    def fetch_one(self):
-        return self.__DB.fetch_one()
-
-
-    def fetch_all(self):
-        return self.__DB.fetch_all()
-
-
     def exit(self):
         self.__WS.quit()
-        self.__DB.close()
 
 
     def validate_title(self, title):
@@ -105,18 +95,20 @@ class SKK:
         return ''.join(kennel_name)
 
 
-    def save_dog(self, kennel_name, registration_number):
-        self.execute("""SELECT id FROM dog2 WHERE kennel_name = %s""", (kennel_name, ))
-        if self.fetch_one() is None:
-            self.execute("""INSERT INTO dog2(kennel_name, registration_number) VALUES (%s, %s)""", (kennel_name, registration_number))
+    def save_dog(self, db, kennel_name, registration_number):
+        db.execute("""SELECT id FROM dog2 WHERE kennel_name = %s""", (kennel_name, ))
+        if db.fetch_one() is None:
+            db.execute("""INSERT INTO dog2(kennel_name, registration_number) VALUES (%s, %s)""", (kennel_name, registration_number))
 
 
-    def save_title(self, title, registration_number, date):
-        self.execute("""SELECT date FROM title_dog2 WHERE title = (SELECT id FROM title2 WHERE title = %s) AND dog = (SELECT id FROM dog2 WHERE registration_number = %s) LIMIT 1""", (title, registration_number))
-        if self.fetch_one() is None:
-            self.execute("""INSERT INTO title_dog2(title, dog, date) VALUES ((SELECT id FROM title2 WHERE title = %s), (SELECT id FROM dog2 WHERE registration_number = %s), %s)""", (title, registration_number, date))
+    def save_title(self, db, title, registration_number, date):
+        db.execute("""SELECT date FROM title_dog2 WHERE title = (SELECT id FROM title2 WHERE title = %s) AND dog = (SELECT id FROM dog2 WHERE registration_number = %s) LIMIT 1""", (title, registration_number))
+        if db.fetch_one() is None:
+            db.execute("""INSERT INTO title_dog2(title, dog, date) VALUES ((SELECT id FROM title2 WHERE title = %s), (SELECT id FROM dog2 WHERE registration_number = %s), %s)""", (title, registration_number, date))
 
 
     def update_date(self):
-        self.execute("""DELETE FROM date2""")
-        self.execute("""INSERT INTO date2(date) VALUES (%s)""", (datetime.today(), ))
+        db = Database()
+        db.execute("""DELETE FROM date2""")
+        db.execute("""INSERT INTO date2(date) VALUES (%s)""", (datetime.today(), ))
+        db.close()

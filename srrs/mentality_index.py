@@ -13,7 +13,6 @@ from web_scraping import WebScraping
 
 class MentalityIndex:
     __WS = WebScraping()
-    __DB = Database()
 
 
     class Values(Enum):
@@ -38,12 +37,13 @@ class MentalityIndex:
                 if i == 1 and len(breeding_values[i].text) == 0: break
                 mentality_index.append([breeding_values[i].text, confidence_values[i].text])
             if len(mentality_index) > 0:
-                self.__DB.execute("""UPDATE dog SET mentality_index = %s WHERE kennel_name = %s""", (json.dumps(mentality_index), kennel_name))
+                db = Database()
+                db.execute("""UPDATE dog SET mentality_index = %s WHERE kennel_name = %s""", (json.dumps(mentality_index), kennel_name))
+                db.close()
 
             if kennel_name != kennel_names[len(kennel_names) - 1]: self.__WS.randomized_delay()
 
         self.__WS.quit()
-        self.__DB.close()
 
 
 if __name__ == '__main__':
