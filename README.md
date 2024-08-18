@@ -22,7 +22,7 @@ This script retrieves all rhodesian ridgeback kennel names that have at least on
 
 #### search_competitions.py
 
-This script retrieves rhodesian ridgeback's competition results in dog sports since 1993. At the moment obedience and working dog trials are supported. Besides single competition results, it also retrieves titles and thus complements _search_titles.py_.
+This script retrieves rhodesian ridgeback's competition results in dog sports since 1993. At the moment obedience, working dog trials, and blood tracking are supported. Besides single competition results, it also retrieves titles and thus complements _search_titles.py_.
 
 #### search_titles.py
 
