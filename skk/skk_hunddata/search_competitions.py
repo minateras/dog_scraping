@@ -18,7 +18,7 @@ from web_scraping import WebScraping
 
 class SearchCompetitions(SKK):
     URL = 'https://hundar.skk.se/hunddata/Tavling_sok.aspx'
-    start_year = 1993
+    start_year = 1994
     END_YEAR = WebScraping.get_next_year()
     start_month = 1
     END_MONTH = 13
@@ -29,12 +29,30 @@ class SearchCompetitions(SKK):
         SELECT_DATE = 'bodyContent_txtTillfalle'
         SELECT_COMPETITION_TYPE = 'bodyContent_ddlTypkod'
         COMPETITION_TYPES = {
-            'Bruksprov Int': ['sport', 'klass', 'prize', 'points'],
-            'Bruksprov Nat': ['sport', 'klass', 'prize', 'points'],
-            'Bruksprov Nat Plac.': ['sport', 'klass', 'prize', 'points'],
-            'Lydnad Int.': ['klass', 'points', 'prize'],
-            'Lydnad Nat.': ['klass', 'points', 'prize'],
-            'Viltspårprov': ['klass', 'prize'],
+            'Bruksprov Int': {
+                'search_interval': [1998, 1999],
+                'data_types': ['sport', 'klass', 'prize', 'points'],
+            },
+            'Bruksprov Nat': {
+                'search_interval': [1994],
+                'data_types': ['sport', 'klass', 'prize', 'points'],
+            },
+            'Bruksprov Nat Plac.': {
+                'search_interval': [1998, 1999],
+                'data_types': ['sport', 'klass', 'prize', 'points'],
+            },
+            'Lydnad Int.': {
+                'search_interval': [1993, 2016],
+                'data_types': ['klass', 'points', 'prize'],
+            },
+            'Lydnad Nat.': {
+                'search_interval': [2010],
+                'data_types': ['klass', 'points', 'prize'],
+            },
+            'Viltspårprov': {
+                'search_interval': [1994],
+                'data_types': ['klass', 'prize'],
+            },
         }
         SELECT_BREED = 'bodyContent_ddlRas'
         BUTTON_SEARCH = 'bodyContent_btnSearch'
@@ -113,7 +131,9 @@ class SearchCompetitions(SKK):
 
 
     def __run(self):
-        for competition_type, data_types in self.Values.COMPETITION_TYPES.value.items():
+        for competition_type, config in self.Values.COMPETITION_TYPES.value.items():
+            search_interval = config.get('search_interval')
+            data_types = config.get('data_types')
             competition_results = []
 
             self.wait_until(self.Values.SELECT_COMPETITION_TYPE.value) # Ensures that the select elements are present.
@@ -123,9 +143,9 @@ class SearchCompetitions(SKK):
             select_breed.select_by_visible_text(self.BREED)
 
             # For every year...
-            for y in range(self.start_year, self.END_YEAR): # self.start_year, self.END_YEAR
+            for y in range(self.start_year if self.start_year != 1994 else search_interval[0], self.END_YEAR if self.start_year != 1994 or len(search_interval) == 1 else search_interval[1]):
                 # For every month...
-                for m in range(self.start_month, self.END_MONTH): # self.start_month, self.END_MONTH
+                for m in range(self.start_month, self.END_MONTH):
                     select_date = self.find_element(self.Values.SELECT_DATE.value)
                     select_date.clear()
                     select_date.send_keys(f"{y}-{str(m).rjust(2, '0')}")
