@@ -30,26 +30,32 @@ class SearchCompetitions(SKK):
         SELECT_COMPETITION_TYPE = 'bodyContent_ddlTypkod'
         COMPETITION_TYPES = {
             'Bruksprov Int': {
+                'sport': 6,
                 'search_interval': [1998, 1999],
                 'data_types': ['sport', 'klass', 'prize', 'points'],
             },
             'Bruksprov Nat': {
+                'sport': 6,
                 'search_interval': [1994],
                 'data_types': ['sport', 'klass', 'prize', 'points'],
             },
             'Bruksprov Nat Plac.': {
+                'sport': 6,
                 'search_interval': [1999, 2000],
                 'data_types': ['sport', 'klass', 'prize', 'points'],
             },
             'Lydnad Int.': {
+                'sport': 5,
                 'search_interval': [1993, 2016],
                 'data_types': ['klass', 'points', 'prize'],
             },
             'Lydnad Nat.': {
+                'sport': 5,
                 'search_interval': [2010],
                 'data_types': ['klass', 'points', 'prize'],
             },
             'Viltspårprov': {
+                'sport': 14,
                 'search_interval': [1994],
                 'data_types': ['klass', 'prize'],
             },
@@ -62,14 +68,6 @@ class SearchCompetitions(SKK):
 
     def __init__(self):
         super().__init__(self.URL)
-        db = Database()
-        db.execute("""SELECT MAX(date) FROM competition_result2""")
-        date = db.fetch_one()[0]
-        db.close()
-        if date is not None:
-            date = date
-            self.start_year = date.year
-            self.start_month = date.month
         with open(Path(__file__).parent / 'prize_points_limit.json') as f:
             self.prize_points_limit = json.loads(f.read())
 
@@ -132,6 +130,16 @@ class SearchCompetitions(SKK):
 
     def __run(self):
         for competition_type, config in self.Values.COMPETITION_TYPES.value.items():
+            sport = config.get('sport')
+            db = Database()
+            db.execute("""SELECT MAX(c.date) FROM competition_result2 AS c, klass2 AS k, sport2 AS s WHERE c.klass = k.id AND k.sport = s.id AND ((s.parent IS NULL AND s.id = %s) OR (s.parent IS NOT NULL AND s.parent = %s))""", (sport, sport, ))
+            date = db.fetch_one()[0]
+            db.close()
+            start_year = self.start_year
+            start_month = self.start_month
+            if date is not None:
+                start_year = date.year
+                start_month = date.month
             search_interval = config.get('search_interval')
             data_types = config.get('data_types')
             competition_results = []
@@ -143,9 +151,9 @@ class SearchCompetitions(SKK):
             select_breed.select_by_visible_text(self.BREED)
 
             # For every year...
-            for y in range(self.start_year if self.start_year != 1994 else search_interval[0], self.END_YEAR if self.start_year != 1994 or len(search_interval) == 1 else search_interval[1]):
+            for y in range(start_year if start_year != 1994 else search_interval[0], self.END_YEAR if start_year != 1994 or len(search_interval) == 1 else search_interval[1]):
                 # For every month...
-                for m in range(self.start_month, self.END_MONTH):
+                for m in range(start_month, self.END_MONTH):
                     select_date = self.find_element(self.Values.SELECT_DATE.value)
                     select_date.clear()
                     select_date.send_keys(f"{y}-{str(m).rjust(2, '0')}")
