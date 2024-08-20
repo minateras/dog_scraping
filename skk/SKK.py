@@ -90,7 +90,7 @@ class SKK:
             current = kennel_name[i]
             next = kennel_name[i + 1] if (i + 1) < len(kennel_name) else None
             # If previous is an apostrophe, current is a letter, and next is a space (or the end):
-            if previous == "'" and current.isalpha() and (next == ' ' or next is None):
+            if previous == "'" and current.isalpha() and (next == ' ' or next is None or (current.lower() == 'r' and next.lower() == 'e')):
                 kennel_name[i] = current.lower()
         return ''.join(kennel_name)
 
