@@ -20,7 +20,7 @@ class SearchCompetitions(SKK):
     URL = 'https://hundar.skk.se/hunddata/Tavling_sok.aspx'
     start_year = 1994
     END_YEAR = WebScraping.get_next_year()
-    start_month = 1
+    START_MONTH = 1
     END_MONTH = 13
     prize_points_limit = None
 
@@ -136,10 +136,8 @@ class SearchCompetitions(SKK):
             date = db.fetch_one()[0]
             db.close()
             start_year = self.start_year
-            start_month = self.start_month
             if date is not None:
                 start_year = date.year
-                start_month = date.month
             search_interval = config.get('search_interval')
             data_types = config.get('data_types')
             competition_results = []
@@ -151,9 +149,9 @@ class SearchCompetitions(SKK):
             select_breed.select_by_visible_text(self.BREED)
 
             # For every year...
-            for y in range(start_year if start_year != 1994 else search_interval[0], self.END_YEAR if start_year != 1994 or len(search_interval) == 1 else search_interval[1]):
+            for y in range(start_year if start_year != 1994 else search_interval[0], self.END_YEAR if len(search_interval) == 1 else search_interval[1]):
                 # For every month...
-                for m in range(start_month, self.END_MONTH):
+                for m in range(self.START_MONTH, self.END_MONTH):
                     select_date = self.find_element(self.Values.SELECT_DATE.value)
                     select_date.clear()
                     select_date.send_keys(f"{y}-{str(m).rjust(2, '0')}")
