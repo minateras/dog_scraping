@@ -9,6 +9,7 @@ import numpy as np
 class PolarPlot:
     PATH = Path(__file__).parent
     PATH_TO_INPUT = PATH / 'input'
+    PATH_TO_OUTPUT = PATH / 'output'
     FONT_SIZE = 20
     FIGURE_SIZE = (10, 10)
     DPI = 300
@@ -94,5 +95,7 @@ class PolarPlot:
 
 
     def __save_as_image_file(self, object, with_explanations=False):
+        Path(self.PATH_TO_OUTPUT).mkdir(exist_ok=True)
+
         image_file = f'{type(object).__name__}{'_2' if with_explanations else ''}.png'
-        plt.savefig(self.PATH / f'output/{image_file}', bbox_inches=self.FIT, format='png', transparent=True)
+        plt.savefig(self.PATH_TO_OUTPUT / image_file, bbox_inches=self.FIT, format='png', transparent=True)
